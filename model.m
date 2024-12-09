@@ -15,27 +15,38 @@ p.F1_in = 10000/(3600*1000);    % m^3/s
 
 %%Solverparameter 
 y0 = [p.cA_in 0 0]; % [cA_in cR_in cS_in]
-tspan = [0 200];
+tspancstr = [0 200];
+tspanbatch = [0 2000];
 % tspan = 0:0.01:50;
 option = odeset;
 
 %%Solver
-[t, y] = ode45(@F1_cstr, tspan, y0, option, p); 
-%[t, y] = ode45(@F1_batch, tspan, y0, option, p);
+[t_cstr, y_cstr] = ode45(@F1_cstr, tspancstr, y0, option, p); 
+[t_batch, y_batch] = ode45(@F1_batch, tspanbatch, y0, option, p);
 
-%% Plot
+%%Optimale Verweilzeit Batch Reaktor
+cR = y_batch(:, 2); % Extrahieren von cR
+
+% Finden des Maximums von cR
+[cR_max, idx_max] = max(cR); % Maximum von cR und zugehörigen Index ermitteln
+t_max_cR = t_batch(idx_max); % Zeitwert an der Stelle des Maximums
+
+% Ergebnis ausgeben
+fprintf('Das Maximum von cR (%.4f mol/m^3) wird bei t = %.2f Sekunden erreicht.\n', cR_max, t_max_cR);
+
+%% Plot CSTR
 figure; % Neues Fenster für das Plot
 hold on; % Alle Graphen im selben Fenster
 
 % Konzentration von A, R und S über der Zeit plotten
-plot(t, y(:, 1), 'r', 'LineWidth', 2); % cA in rot
-plot(t, y(:, 2), 'g', 'LineWidth', 2); % cR in grün
-plot(t, y(:, 3), 'b', 'LineWidth', 2); % cS in blau
+plot(t_cstr, y_cstr(:, 1), 'r', 'LineWidth', 2); % cA in rot
+plot(t_cstr, y_cstr(:, 2), 'g', 'LineWidth', 2); % cR in grün
+plot(t_cstr, y_cstr(:, 3), 'b', 'LineWidth', 2); % cS in blau
 
 % Achsenbeschriftungen und Titel
 xlabel('Zeit (s)', 'FontSize', 12);
 ylabel('Konzentration (mol/m^3)', 'FontSize', 12);
-title('Konzentrationsverläufe der Spezies A, R und S', 'FontSize', 14);
+title('Konzentrationsverläufe der Spezies A, R und S für den CSTR-Reaktor', 'FontSize', 14);
 
 % Legende hinzufügen
 legend('cA (rot)', 'cR (grün)', 'cS (blau)', 'Location', 'northeast');
@@ -45,4 +56,24 @@ grid on;
 
 hold off; % Plot beenden
 
-%%Plots
+%% Plot Batch
+figure; % Neues Fenster für das Plot
+hold on; % Alle Graphen im selben Fenster
+
+% Konzentration von A, R und S über der Zeit plotten
+plot(t_batch, y_batch(:, 1), 'r', 'LineWidth', 2); % cA in rot
+plot(t_batch, y_batch(:, 2), 'g', 'LineWidth', 2); % cR in grün
+plot(t_batch, y_batch(:, 3), 'b', 'LineWidth', 2); % cS in blau
+
+% Achsenbeschriftungen und Titel
+xlabel('Zeit (s)', 'FontSize', 12);
+ylabel('Konzentration (mol/m^3)', 'FontSize', 12);
+title('Konzentrationsverläufe der Spezies A, R und S für den Batch-Reaktor', 'FontSize', 14);
+
+% Legende hinzufügen
+legend('cA (rot)', 'cR (grün)', 'cS (blau)', 'Location', 'northeast');
+
+% Gitter anzeigen
+grid on;
+
+hold off; % Plot beenden
