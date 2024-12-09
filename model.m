@@ -19,7 +19,7 @@ option = odeset;
 %% Optimaler Volumenstrom
 
 % Speicher für Ergebnisse
-max_cR_values = []; % Maxima von cR
+max_cR_cstr_values = []; % Maxima von cR
 optimal_F = [];     % Volumenstrom mit dem größten Maximum von cR
 
 % Simulation für jeden Volumenstrom
@@ -27,17 +27,17 @@ for i = 1:length(volumenstroeme)
     p.F1_in = volumenstroeme(i); % Setzen des aktuellen Volumenstroms
     [t_cstr, y_cstr] = ode45(@F1_cstr, tspancstr, y0, option, p); % Simulation
     
-    cR = y_cstr(:, 2); % Konzentration cR extrahieren
-    [cR_max, idx_max] = max(cR); % Maximum von cR finden
-    max_cR_values(end + 1) = cR_max; % Speichern des Maximums
+    cR_cstr = y_cstr(:, 2); % Konzentration cR extrahieren
+    [cR_cstr_max, idx_max] = max(cR_cstr); % Maximum von cR finden
+    max_cR_cstr_values(end + 1) = cR_cstr_max; % Speichern des Maximums
     
     % Ergebnis ausgeben
     fprintf('Volumenstrom F = %.10f m^3/s, Maximum von cR = %.5f mol/m^3\n', ...
-            volumenstroeme(i), cR_max);
+            volumenstroeme(i), cR_cstr_max);
 end
 
 % Optimalen Volumenstrom finden
-[optimal_cR_max, optimal_idx] = max(max_cR_values);
+[optimal_cR_cstr_max, optimal_idx] = max(max_cR_cstr_values);
 optimal_F = volumenstroeme(optimal_idx);
 
 %% Simulation mit dem optimalen Volumenstrom
@@ -46,20 +46,20 @@ p.F1_in = optimal_F; % Setzen des optimalen Volumenstroms
 
 % Ergebnis ausgeben
 fprintf('\nDer optimale Volumenstrom ist F = %.10f m^3/s mit cR_max = %.5f mol/m^3.\n', ...
-        optimal_F, optimal_cR_max);
+        optimal_F, optimal_cR_cstr_max);
 
 %%Solver Batch Reaktor 
 [t_batch, y_batch] = ode45(@F1_batch, tspanbatch, y0, option, p);
 
 %%Optimale Verweilzeit Batch Reaktor
-cR = y_batch(:, 2); % Extrahieren von cR
+cR_batch = y_batch(:, 2); % Extrahieren von cR
 
 % Finden des Maximums von cR
-[cR_max, idx_max] = max(cR); % Maximum von cR und zugehörigen Index ermitteln
-t_max_cR = t_batch(idx_max); % Zeitwert an der Stelle des Maximums
+[cR_batch_max, idx_max] = max(cR_batch); % Maximum von cR und zugehörigen Index ermitteln
+t_max_cR_batch = t_batch(idx_max); % Zeitwert an der Stelle des Maximums
 
 % Ergebnis ausgeben
-fprintf('Das Maximum von cR (%.4f mol/m^3) wird bei t = %.2f Sekunden erreicht.\n', cR_max, t_max_cR);
+fprintf('Das Maximum von cR (%.4f mol/m^3) wird bei t = %.2f Sekunden erreicht.\n', cR_batch_max, t_max_cR_batch);
 
 %% Plot CSTR
 figure; % Neues Fenster für das Plot
@@ -73,7 +73,8 @@ plot(t_cstr_opt, y_cstr_opt(:, 3), 'b', 'LineWidth', 2); % cS in blau
 % Achsenbeschriftungen und Titel
 xlabel('Zeit (s)', 'FontSize', 12);
 ylabel('Konzentration (mol/m^3)', 'FontSize', 12);
-title('Konzentrationsverläufe der Spezies A, R und S für den CSTR-Reaktor', 'FontSize', 14);
+title({'Konzentrationsverläufe der Spezies A, R und S für den CSTR-Reaktor', ...
+       'mit dem Volumenstrom von 10 l/h'}, 'FontSize', 14);
 
 % Legende hinzufügen
 legend('cA (rot)', 'cR (grün)', 'cS (blau)', 'Location', 'northeast');

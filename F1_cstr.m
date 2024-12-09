@@ -13,7 +13,7 @@ function [dydt] = F1_cstr(t,y,p)
     dcRdt = -p.F1_in/p.V * cR + r1 - r2;
     dcSdt = -p.F1_in/p.V * cS + 2 * r3;
 
-    disp(['Zeit: ', num2str(t), ' cA: ', num2str(cA)]);
+    %disp(['Zeit: ', num2str(t), ' cA: ', num2str(cA)]);
 
     dydt = [dcAdt; dcRdt; dcSdt];
 end
