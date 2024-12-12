@@ -34,6 +34,34 @@ for i = 1:length(volumenstroeme)
     % Ergebnis ausgeben
     fprintf('Volumenstrom F = %.10f m^3/s, Maximum von cR = %.5f mol/m^3\n', ...
             volumenstroeme(i), cR_cstr_max);
+
+    %Plot der Kurven für den aktuellen Durchlauf
+    figure; % Neues Fenster für das Plot
+        hold on; % Alle Graphen im selben Fenster
+
+        % Konzentration von A, R und S über der Zeit plotten
+        plot(t_cstr, y_cstr(:, 1), 'r', 'LineWidth', 2); % cA in rot
+        plot(t_cstr, y_cstr(:, 2), 'g', 'LineWidth', 2); % cR in grün
+        plot(t_cstr, y_cstr(:, 3), 'b', 'LineWidth', 2); % cS in blau
+
+        % Achsenbeschriftungen und Titel
+        xlabel('Zeit (s)', 'FontSize', 12);
+        ylabel('Konzentration (mol/m^3)', 'FontSize', 12);
+
+        % Dynamischen Titel setzen
+        current_F = volumenstroeme(i); % Aktueller Volumenstrom
+        title({sprintf('Konzentrationsverläufe der Spezies A, R und S für den CSTR-Reaktor'), ...
+           sprintf('mit dem Volumenstrom von F = %.10f m^3/s', current_F)}, ...
+           'FontSize', 14);
+
+        % Legende hinzufügen
+        legend('cA (rot)', 'cR (grün)', 'cS (blau)', 'Location', 'northeast');
+
+        % Gitter anzeigen
+        grid on;
+
+        hold off; % Plot beenden
+
 end
 
 % Optimalen Volumenstrom finden
@@ -60,29 +88,6 @@ t_max_cR_batch = t_batch(idx_max); % Zeitwert an der Stelle des Maximums
 
 % Ergebnis ausgeben
 fprintf('Das Maximum von cR (%.4f mol/m^3) wird bei t = %.2f Sekunden erreicht.\n', cR_batch_max, t_max_cR_batch);
-
-%% Plot CSTR
-figure; % Neues Fenster für das Plot
-hold on; % Alle Graphen im selben Fenster
-
-% Konzentration von A, R und S über der Zeit plotten
-plot(t_cstr_opt, y_cstr_opt(:, 1), 'r', 'LineWidth', 2); % cA in rot
-plot(t_cstr_opt, y_cstr_opt(:, 2), 'g', 'LineWidth', 2); % cR in grün
-plot(t_cstr_opt, y_cstr_opt(:, 3), 'b', 'LineWidth', 2); % cS in blau
-
-% Achsenbeschriftungen und Titel
-xlabel('Zeit (s)', 'FontSize', 12);
-ylabel('Konzentration (mol/m^3)', 'FontSize', 12);
-title({'Konzentrationsverläufe der Spezies A, R und S für den CSTR-Reaktor', ...
-       'mit dem Volumenstrom von 10 l/h'}, 'FontSize', 14);
-
-% Legende hinzufügen
-legend('cA (rot)', 'cR (grün)', 'cS (blau)', 'Location', 'northeast');
-
-% Gitter anzeigen
-grid on;
-
-hold off; % Plot beenden
 
 %% Plot Batch
 figure; % Neues Fenster für das Plot
