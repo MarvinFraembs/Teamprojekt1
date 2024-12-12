@@ -8,7 +8,7 @@ function [dydt] = F1_batch(t,y,p)
     r2 = cR * p.k2;
     r3 = cS * p.k3;
 
-    dcAdt = -r1 + r2 - 2 * r3;
+    dcAdt = -r1 + r2 - r3;
     dcRdt = r1 - r2;
     dcSdt = 2 * r3;
 

@@ -9,7 +9,7 @@ function [dydt] = F1_cstr(t,y,p)
     r3 = cA * p.k3;
 
     % Annahme Fin = Fout
-    dcAdt = p.F1_in/p.V * (p.cA_in - cA) - r1 + r2 - 2 * r3;
+    dcAdt = p.F1_in/p.V * (p.cA_in - cA) - r1 + r2 - r3;
     dcRdt = -p.F1_in/p.V * cR + r1 - r2;
     dcSdt = -p.F1_in/p.V * cS + 2 * r3;
 
