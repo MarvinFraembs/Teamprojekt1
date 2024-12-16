@@ -11,7 +11,7 @@ volumenstroeme = [10000, 1000, 100, 10] / (3600 * 1000); % Liste der VolumenstrÃ
 
 %%Solverparameter 
 y0 = [p.cA_in 0 0]; % [cA_in cR_in cS_in]
-tspancstr = [0 200];
+tspancstr = [0 20000];
 tspanbatch = [0 2000];
 % tspan = 0:0.01:50;
 option = odeset;
