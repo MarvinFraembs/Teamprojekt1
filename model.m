@@ -11,7 +11,7 @@ volumenstroeme = [10000, 1000, 100, 10] / (3600 * 1000); % Liste der Volumenstr�
 
 %%Solverparameter 
 y0 = [p.cA_in 0 0]; % [cA_in cR_in cS_in]
-tspancstr = [0 20000];
+tspancstr = [0 40000];
 tspanbatch = [0 2000];
 % tspan = 0:0.01:50;
 option = odeset;
@@ -23,58 +23,71 @@ max_cR_cstr_values = []; % Maxima von cR
 optimal_F = [];     % Volumenstrom mit dem größten Maximum von cR
 
 % Simulation für jeden Volumenstrom
-for i = 1:length(volumenstroeme)
+for i = 1:length(volumenstroeme)      
     p.F1_in = volumenstroeme(i); % Setzen des aktuellen Volumenstroms
-    [t_cstr, y_cstr] = ode45(@F1_cstr, tspancstr, y0, option, p); % Simulation
+    [t_cstr, y_cstr] = ode45(@(t, y) F1_cstr(t, y, p), tspancstr, y0); % Simulation
     
     cR_cstr = y_cstr(:, 2); % Konzentration cR extrahieren
-    [cR_cstr_max, idx_max] = max(cR_cstr); % Maximum von cR finden
+    
+    % Stationären Zustand bestimmen: Änderung < 0.01 mol/m^3
+    delta_cR = abs(diff(cR_cstr));
+    idx_stationary = find(delta_cR < 0.01, 1, 'last');
+    
+    if ~isempty(idx_stationary)
+        cR_cstr_stationary = cR_cstr(idx_stationary:end); % Werte nach stationärem Zustand
+        [cR_cstr_max, idx_max] = max(cR_cstr_stationary); % Maximum nach stationärem Zustand
+    else
+        cR_cstr_max = NaN; % Kein stationärer Zustand erreicht
+    end
+    
     max_cR_cstr_values(end + 1) = cR_cstr_max; % Speichern des Maximums
     
     % Ergebnis ausgeben
-    fprintf('Volumenstrom F = %.10f m^3/s, Maximum von cR = %.5f mol/m^3\n', ...
+    printf('Volumenstrom F = %.10f m^3/s, Maximum von cR = %.5f mol/m^3\n', ...
             volumenstroeme(i), cR_cstr_max);
 
-    %Plot der Kurven für den aktuellen Durchlauf
+    % Plot der Kurven für den aktuellen Durchlauf
     figure; % Neues Fenster für das Plot
-        hold on; % Alle Graphen im selben Fenster
+    hold on; % Alle Graphen im selben Fenster
 
-        % Konzentration von A, R und S über der Zeit plotten
-        plot(t_cstr, y_cstr(:, 1), 'r', 'LineWidth', 2); % cA in rot
-        plot(t_cstr, y_cstr(:, 2), 'g', 'LineWidth', 2); % cR in grün
-        plot(t_cstr, y_cstr(:, 3), 'b', 'LineWidth', 2); % cS in blau
+    % Konzentration von A, R und S über der Zeit plotten
+    plot(t_cstr, y_cstr(:, 1), 'r', 'LineWidth', 2); % cA in rot
+    plot(t_cstr, y_cstr(:, 2), 'g', 'LineWidth', 2); % cR in grün
+    plot(t_cstr, y_cstr(:, 3), 'b', 'LineWidth', 2); % cS in blau
 
-        % Achsenbeschriftungen und Titel
-        xlabel('Zeit (s)', 'FontSize', 12);
-        ylabel('Konzentration (mol/m^3)', 'FontSize', 12);
+    % Achsenbeschriftungen und Titel
+    xlabel('Zeit (s)', 'FontSize', 12);
+    ylabel('Konzentration (mol/m^3)', 'FontSize', 12);
 
-        % Dynamischen Titel setzen
-        current_F = volumenstroeme(i); % Aktueller Volumenstrom
-        title({sprintf('Konzentrationsverläufe der Spezies A, R und S für den CSTR-Reaktor'), ...
+    % Dynamischen Titel setzen
+    current_F = volumenstroeme(i); % Aktueller Volumenstrom
+    title({sprintf('Konzentrationsverläufe der Spezies A, R und S für den CSTR-Reaktor'), ...
            sprintf('mit dem Volumenstrom von F = %.10f m^3/s', current_F)}, ...
            'FontSize', 14);
 
-        % Legende hinzufügen
-        legend('cA (rot)', 'cR (grün)', 'cS (blau)', 'Location', 'northeast');
+    % Legende hinzufügen
+    legend('cA (rot)', 'cR (grün)', 'cS (blau)', 'Location', 'northeast');
 
-        % Gitter anzeigen
-        grid on;
+    % Gitter anzeigen
+    grid on;
 
-        hold off; % Plot beenden
-
+    hold off; % Plot beenden
 end
 
-% Optimalen Volumenstrom finden
-[optimal_cR_cstr_max, optimal_idx] = max(max_cR_cstr_values);
-optimal_F = volumenstroeme(optimal_idx);
+% Bestimmen des optimalen Volumenstroms basierend auf cR-Werten
+[~, optimal_idx] = max(max_cR_cstr_values); % Index mit dem höchsten cR-Wert
+optimal_F = volumenstroeme(optimal_idx); % Entsprechender Volumenstrom
 
-%% Simulation mit dem optimalen Volumenstrom
-p.F1_in = optimal_F; % Setzen des optimalen Volumenstroms
-[t_cstr_opt, y_cstr_opt] = ode45(@F1_cstr, tspancstr, y0, option, p);
+printf('Optimaler Volumenstrom F = %.10f m^3/s mit Maximum von cR = %.5f mol/m^3\n', ...
+        optimal_F, max_cR_cstr_values(optimal_idx));
+
+% Bestimmen des optimalen Volumenstroms basierend auf cR-Werten
+[~, optimal_idx] = max(max_cR_cstr_values); % Index mit dem höchsten cR-Wert
+optimal_F = volumenstroeme(optimal_idx); % Entsprechender Volumenstrom
 
 % Ergebnis ausgeben
-fprintf('\nDer optimale Volumenstrom ist F = %.10f m^3/s mit cR_max = %.5f mol/m^3.\n', ...
-        optimal_F, optimal_cR_cstr_max);
+fprintf('Optimaler Volumenstrom F = %.10f m^3/s mit Maximum von cR = %.5f mol/m^3\n', ...
+        optimal_F, max_cR_cstr_values(optimal_idx));
 
 %%Solver Batch Reaktor 
 [t_batch, y_batch] = ode45(@F1_batch, tspanbatch, y0, option, p);
@@ -90,7 +103,7 @@ t_max_cR_batch = t_batch(idx_max); % Zeitwert an der Stelle des Maximums
 fprintf('Das Maximum von cR (%.4f mol/m^3) wird bei t = %.2f Sekunden erreicht.\n', cR_batch_max, t_max_cR_batch);
 
 %% Plot Batch
-figure; % Neues Fenster für das Plot
+figure; % Neues Fenster für den Plot
 hold on; % Alle Graphen im selben Fenster
 
 % Konzentration von A, R und S über der Zeit plotten
