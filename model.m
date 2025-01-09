@@ -50,6 +50,11 @@ cZ_pftr = y_pftr(:,2);
 vwz_pftr = 0;
 
 n_elements = 0;
+n_elements_int = 0;
+vwz_pftr_new = 0;
+vwz_pftr_new_int = 0;
+molanteil_new = 0;
+
 
 A_pftr = pi * (p.d_pftr/2)^2;
 
@@ -59,9 +64,12 @@ for i = 1:length(t_pftr)
     if molanteil > 0.95
         vwz_pftr = t_pftr(i);
         n_elements = (p.V_dot * vwz_pftr)/(A_pftr*p.l_element);
-        n_elements = ceil(n_elements);  
-
-        fprintf("Anzahl der PFTR-Elemente: %d\n", n_elements);
+        n_elements_int = ceil(n_elements);  
+        fprintf("Anzahl der PFTR-Elemente: %d\n", n_elements_int);
+        vwz_pftr_new = (A_pftr * n_elements_int) / p.V_dot;
+        vwz_pftr_new_int = ceil(vwz_pftr_new);
+        molanteil_new = cZ_pftr(vwz_pftr_new_int) / (cR_pftr(vwz_pftr_new_int) + cZ_pftr(vwz_pftr_new_int));
+        fprintf("Der neue Molanteil für den PFTR: %d\n", molanteil_new);
 
         break;
     end
