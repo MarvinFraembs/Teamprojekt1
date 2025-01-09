@@ -4,7 +4,7 @@ close all;
 
 p.V_dot = 400 * 0.001 / 3600; % m^3 / s
 p.cR_in = 350; % mol/m^3
-p.r = 0.00005; % m^3 / (mol*s)
+p.k4 = 0.00005; % m^3 / (mol*s)
 p.V_cstr = 1; %m^3
 p.d_pftr = 0.125; %m
 p.l_element = 1; %m
