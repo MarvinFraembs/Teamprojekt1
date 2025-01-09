@@ -11,7 +11,7 @@ p.l_element = 1; %m
 
 %%Solverparameter 
 y0 = [p.cR_in 0]; % [cR_in cZ_in]
-tspancstr = [0 : 1: 50000];
+tspancstr = [0 : 1: 10000];
 tspanpftr = [0 : 1: 4000];
 option = odeset;
 
