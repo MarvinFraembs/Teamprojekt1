@@ -11,8 +11,8 @@ p.l_element = 1; %m
 
 %%Solverparameter 
 y0 = [p.cR_in 0]; % [cR_in cZ_in]
-tspancstr = [0 : 1: 100000];
-tspanpftr = [0 : 1: 100000];
+tspancstr = [0 : 1: 50000];
+tspanpftr = [0 : 1: 4000];
 option = odeset;
 
 [t_cstr, y_cstr] = ode45(@(t, y) F2_cstr(t, y, p), tspancstr, y0); % Simulation CSTR
