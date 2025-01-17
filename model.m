@@ -2,26 +2,9 @@ clc;
 clear all;
 close all;
 
-p.k1 = 0.007;
-p.k2 = 0.007;
-p.k3 = 0.0012;
-p.V = 0.1;
-p.cA_in = 1000;
-%p.F_in = [10000/3600, 1000/3600, 100/3600, 10/3600];
-p.F1_in = 10000/(3600*1000);
-% p.F2_in = 1000/3600; 
-% p.F3_in = 100/3600;
-% p.F4_in = 10/3600;
 
-%%Solverparameter 
-y0 = [p.cA_in 0 0]; % [cA_in cR_in cS_in]
-tspan = [0 200];
-% tspan = 0:0.01:50;
-option = odeset;
 
-%%Solver
-[t, y] = ode45(@F1_cstr, tspan, y0, option, p); 
-%[t, y] = ode45(@F1_batch, tspan, y0, option, p);
+
 
 %% Plot
 figure; % Neues Fenster für das Plot
