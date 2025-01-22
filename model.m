@@ -6,7 +6,6 @@ close all;
 p.F1_in = 1000/(3600*1000); % m^3/s
 p.A = 6;           % m^2
 p.V = 0.1;         % m^3
-p.Tau = 300;       % s
 p.T_in = 293.15;   % K
 p.T_Oel1 = 353.15; % K
 p.Cp_A = 2300;     % J/mol*K
@@ -19,19 +18,21 @@ p.k1 = 0.007;      % 1/s
 p.k2 = 0.007;      % 1/s
 p.k3 = 0.0012;     % 1/s
 p.cA_in = 1000;    % mol/m^3
+p.kA = 1250/9;     % W/(m^2*K)
+p.Q = p.A * (p.T_Oel1-p.T_in)*p.kA % W
 
 %Prozessidentifikation
 
 p.m_ks = 100;      % kg
 p.T_Oel2 = 350;    % K
 p.Cp_ks = 2500;    % J/kg*K
-p.kA = 1250/9;     % W/(m^2*K)
+p.Tau = 300;       % s
 
 %% Solver Prozessidentifikation
 
 %Solverparameter
 y0 = [p.T_in, p.cA_in, 0, 0]; % [T_in]
-tspan = [0 500];
+tspan = [0 4000];
 option = odeset;
 
 [t, y] = ode45(@(t, y) F1_cstr(t, y, p), tspan, y0);
