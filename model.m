@@ -32,7 +32,7 @@ p.Tau = 300;       % s
 
 %Solverparameter
 y0 = [p.T_in, p.cA_in, 0, 0]; % [T_in]
-tspan = [0 4000];
+tspan = [0 2000];
 option = odeset;
 
 [t, y] = ode45(@(t, y) F1_cstr(t, y, p), tspan, y0);
@@ -51,7 +51,7 @@ plot(t, y(:, 4), 'y', 'LineWidth', 2);
 
 % Achsenbeschriftungen und Titel
 xlabel('Zeit (s)', 'FontSize', 12);
-xlim([0 5000]);
+xlim([0 2000]);
 ylabel('Temperatur (Kelvin)/ Konzentration (mol/m^3)', 'FontSize', 12);
 %title('Konzentrationsverläufe der Spezies A, R und S', 'FontSize', 14);
 
